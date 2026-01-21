@@ -1,0 +1,140 @@
+<div class="container">
+  <p-toast></p-toast>
+
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Product Inventory Management</h1>
+        <p class="page-subtitle">Manage your product inventory efficiently</p>
+      </div>
+      <div class="header-actions">
+        <input 
+          type="file" 
+          id="mainFileInput" 
+          accept=".xlsx,.xls" 
+          (change)="onMainFileSelect($event)"
+          style="display: none;">
+        <p-button 
+          label="Import Data" 
+          icon="pi pi-upload"
+          (onClick)="triggerMainFileInput()"
+          [loading]="loading"
+          styleClass="p-button-primary p-button-raised">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-cards">
+    <p-card class="summary-card">
+      <div class="card-content">
+        <div class="card-icon">
+          <i class="pi pi-box" style="font-size: 2rem; color: #3b82f6;"></i>
+        </div>
+        <div class="card-details">
+          <h3 class="card-title">Total Products</h3>
+          <p class="card-value">{{ totalProducts }}</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="summary-card">
+      <div class="card-content">
+        <div class="card-icon">
+          <i class="pi pi-dollar" style="font-size: 2rem; color: #10b981;"></i>
+        </div>
+        <div class="card-details">
+          <h3 class="card-title">Total Inventory Value</h3>
+          <p class="card-value">{{ formatCurrency(totalInventoryValue) }}</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="summary-card">
+      <div class="card-content">
+        <div class="card-icon">
+          <i class="pi pi-calendar" style="font-size: 2rem; color: #f59e0b;"></i>
+        </div>
+        <div class="card-details">
+          <h3 class="card-title">Average Stock Age</h3>
+          <p class="card-value">{{ averageStockAge }} days</p>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <p-card class="table-card">
+    <p-table 
+      [value]="products" 
+      [paginator]="true" 
+      [rows]="pageSize"
+      [totalRecords]="totalElements"
+      [lazy]="true"
+      (onLazyLoad)="onPageChange($event)"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      [sortMode]="'single'"
+      [globalFilterFields]="['sku', 'name', 'category']"
+      styleClass="p-datatable-striped"
+      [tableStyle]="{'min-width': '50rem'}"
+      [loading]="loading">
+      
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          <span class="table-title">Product Inventory</span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="sku">
+            Product SKU <p-sortIcon field="sku"></p-sortIcon>
+          </th>
+          <th pSortableColumn="name">
+            Product Name <p-sortIcon field="name"></p-sortIcon>
+          </th>
+          <th pSortableColumn="category">
+            Category <p-sortIcon field="category"></p-sortIcon>
+          </th>
+          <th pSortableColumn="purchaseDate">
+            Purchase Date <p-sortIcon field="purchaseDate"></p-sortIcon>
+          </th>
+          <th pSortableColumn="unitPrice">
+            Unit Price <p-sortIcon field="unitPrice"></p-sortIcon>
+          </th>
+          <th pSortableColumn="quantity">
+            Quantity <p-sortIcon field="quantity"></p-sortIcon>
+          </th>
+          <th pSortableColumn="stockAgeDays">
+            Stock Age (Days) <p-sortIcon field="stockAgeDays"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-product>
+        <tr>
+          <td>{{ product.sku }}</td>
+          <td>{{ product.name }}</td>
+          <td>
+            <span class="category-badge category-{{ product.category.toLowerCase() }}">
+              {{ product.category }}
+            </span>
+          </td>
+          <td>{{ formatDate(product.purchaseDate) }}</td>
+          <td>{{ formatCurrency(product.unitPrice) }}</td>
+          <td>{{ product.quantity }}</td>
+          <td>
+            <span class="stock-age-badge" [ngClass]="{'high-age': product.stockAgeDays > 60}">
+              {{ product.stockAgeDays }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center">No products found. Please import an Excel file to view data.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>
